@@ -1,8 +1,6 @@
 class Board
   include IBoard
   
-  public
-  
   def initialize
     @cols = []
     8.times do

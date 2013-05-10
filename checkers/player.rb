@@ -25,6 +25,10 @@ class Player
     self.pieces.delete(piece)
   end
   
+  def make_move
+    raise NotImplementedError, "#{__caller__} is not implemented"
+  end
+  
   private
   
   def set_row_of_pieces(row)

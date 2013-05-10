@@ -19,7 +19,7 @@ describe Player do
     }.to change { board.square_occupied?(0, 0) }.from(false)
   end
   
-  it "should know about it's pieces" do
+  it "should keep track of its pieces" do
     expect {
       subject.add_piece(0, 0)
       subject.add_piece(2, 0)
@@ -37,6 +37,4 @@ describe Player do
       subject.lose_piece(piece)
     }.to change(subject.pieces, :size).by(-1)
   end
-  
-  it "should know the possible moves that a piece can make"
 end
