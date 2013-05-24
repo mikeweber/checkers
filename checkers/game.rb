@@ -2,12 +2,16 @@
 class Game
   protected
   attr_accessor :board
-  attr_reader :white, :black
+  attr_reader :red, :black
   
   public
   
   def initialize(player1, player2)
-    @white = player1
+    setup_game(player1, player2)
+  end
+  
+  def setup_game(player1, player2)
+    @red = player1
     @black = player2
     
     setup_board
@@ -16,23 +20,28 @@ class Game
   def setup_board
     @board = Board.new
     
-    self.white.setup_board(self.board, 0)
+    self.red.direction, self.black.direction = [:asc, :desc]
+    self.red.color, self.black.color = [:red, :black]
+    
+    self.red.setup_board(self.board, 0)
     self.black.setup_board(self.board, 5)
   end
   
-  def to_s
-    output = "  0|1|2|3|4|5|6|7\n"
-    
-    8.times do |row|
-      output << "#{row}|"
-      self.board.cols.each.with_index do |column, col|
-        piece = column[row]
-        char = piece.nil? ? ((col + row).odd? ? ' ' : '█') : (piece.player == self.white) ? (piece.kinged? ? '◎' : '○') : (piece.kinged? ? '◉' : '●')
-        output << "#{char}|"
-      end
-      output << "\n"
+  def play!
+    whose_turn = self.black
+    while playing?
+      whose_turn.make_move
+      whose_turn = whose_turn == self.black ? self.red : self.black
     end
     
-    return output
+    if self.red.lost?
+      self.black.you_win!
+    elsif self.black.lost?
+      self.red.you_win!
+    end
+  end
+  
+  def playing?
+    !self.red.lost? && !self.black.lost?
   end
 end

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Piece do
-  subject          { piece }
-  let(:piece)      { Piece.new(desc, board, 0, 0) }
-  let(:board)      { Board.new }
-  let(:desc)    { :desc }
-  let(:asc) { :asc }
+  subject     { piece }
+  let(:piece) { Piece.new(desc, :black, board, 0, 0) }
+  let(:board) { Board.new }
+  let(:desc)  { :desc }
+  let(:asc)   { :asc }
   
   it "should know where it is on the Board" do
     subject.position.should == [0, 0]
@@ -28,8 +28,8 @@ describe Piece do
   end
   
   it "should know friend from foe" do
-    enemy_piece = Piece.new(asc, board, 1, 1)
-    friendly_piece = Piece.new(desc, board, 2, 0)
+    enemy_piece = Piece.new(asc, :red, board, 1, 1)
+    friendly_piece = Piece.new(desc, :black, board, 2, 0)
     
     subject.friend?(enemy_piece).should be_false
     subject.friend?(friendly_piece).should be_true
@@ -43,65 +43,65 @@ describe Piece do
   
   context "when determining legal moves" do
     it "should be able to move forward into available squares" do
-      Piece.new(desc, board, 1, 6).available_moves.should =~ [[0, 5], [2, 5]]
+      Piece.new(desc, :black, board, 1, 6).available_moves_as_coordinates.should =~ [[0, 5], [2, 5]]
     end
     
     it "should not be able to move off the board" do
-      piece = Piece.new(desc, board, 0, 7)
-      piece.available_moves.should =~ [[1, 6]]
-      piece.available_moves.should_not include([-1, 6])
+      piece = Piece.new(desc, :black, board, 0, 7)
+      piece.available_moves_as_coordinates.should =~ [[1, 6]]
+      piece.available_moves_as_coordinates.should_not include([-1, 6])
     end
     
     it "should not be able to move more than one space" do
-      piece = Piece.new(desc, board, 0, 1)
-      piece.available_moves.should_not include([2, 3])
+      piece = Piece.new(desc, :black, board, 0, 1)
+      piece.available_moves_as_coordinates.should_not include([2, 3])
     end
     
     it "should not be able to move backward" do
-      piece = Piece.new(desc, board, 3, 6)
-      piece.available_moves.should_not include([2, 7])
+      piece = Piece.new(desc, :black, board, 3, 6)
+      piece.available_moves_as_coordinates.should_not include([2, 7])
     end
     
     it "should not be able to move to a square occupied by a friendly piece" do
-      piece = Piece.new(desc, board, 0, 7)
+      piece = Piece.new(desc, :black, board, 0, 7)
       expect {
-        Piece.new(desc, board, 1, 6)
-      }.to change(piece, :available_moves).from([[1, 6]]).to([])
+        Piece.new(desc, :black, board, 1, 6)
+      }.to change(piece, :available_moves_as_coordinates).from([[1, 6]]).to([])
     end
     
     it "should be able to jump an opponent's piece" do
-      piece = Piece.new(desc, board, 0, 7)
+      piece = Piece.new(desc, :black, board, 0, 7)
       expect {
-        Piece.new(asc, board, 1, 6)
-      }.to change(piece, :available_moves).from([[1, 6]]).to([[2, 5]])
+        Piece.new(asc, :red, board, 1, 6)
+      }.to change(piece, :available_moves_as_coordinates).from([[1, 6]]).to([[2, 5]])
     end
     
     it "should not be able to jump an opponent's piece when the landing square is occupied" do
-      piece = Piece.new(desc, board, 0, 7)
-      jumpable_piece = Piece.new(asc, board, 1, 6)
+      piece = Piece.new(desc, :black, board, 0, 7)
+      jumpable_piece = Piece.new(asc, :red, board, 1, 6)
       expect {
-        Piece.new(desc, board, 2, 5)
-      }.to change(piece, :available_moves).from([[2, 5]]).to([])
+        Piece.new(desc, :black, board, 2, 5)
+      }.to change(piece, :available_moves_as_coordinates).from([[2, 5]]).to([])
     end
     
     it "should not be able to jump an opponent's piece when the landing is off the board" do
-      piece = Piece.new(desc, board, 1, 6)
+      piece = Piece.new(desc, :black, board, 1, 6)
       expect {
-        Piece.new(asc, board, 0, 5)
-      }.to change(piece, :available_moves).from([[0, 5], [2, 5]]).to([[2, 5]])
+        Piece.new(asc, :red, board, 0, 5)
+      }.to change(piece, :available_moves_as_coordinates).from([[0, 5], [2, 5]]).to([[2, 5]])
       
-      piece = Piece.new(desc, board, 6, 6)
+      piece = Piece.new(desc, :black, board, 6, 6)
       expect {
-        Piece.new(asc, board, 7, 5)
-      }.to change(piece, :available_moves).from([[5, 5], [7, 5]]).to([[5, 5]])
+        Piece.new(asc, :red, board, 7, 5)
+      }.to change(piece, :available_moves_as_coordinates).from([[5, 5], [7, 5]]).to([[5, 5]])
     end
     
     context "when kinged" do
       it "should be able to move backward" do
-        piece = Piece.new(desc, board, 1, 5)
+        piece = Piece.new(desc, :black, board, 1, 5)
         expect {
           piece.king_me!
-        }.to change(piece, :available_moves).from([[0, 4], [2, 4]]).to([[0, 4], [2, 4], [0, 6], [2, 6]])
+        }.to change(piece, :available_moves_as_coordinates).from([[0, 4], [2, 4]]).to([[0, 4], [2, 4], [0, 6], [2, 6]])
       end
     end
   end

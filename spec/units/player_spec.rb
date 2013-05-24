@@ -1,12 +1,19 @@
 require 'spec_helper'
 
 describe Player do
-  subject      { 
-    player.board = board
+  subject        {
+    player.direction = :asc
+    player.setup_board(board)
     player
   }
-  let(:player) { Player.new("Tester") }
-  let(:board)  { Board.new }
+  let(:player)   { Player.new("Tester") }
+  let(:board)    { Board.new }
+  let(:opponent) {
+    opp = Player.new("AI")
+    opp.direction = :desc
+    opp.setup_board(board, 5)
+    opp
+  }
   
   it "requires that a board be set before placing a piece" do
     player.board.should be_nil
@@ -20,6 +27,8 @@ describe Player do
   end
   
   it "should keep track of its pieces" do
+    # initialize subject
+    subject
     expect {
       subject.add_piece(0, 0)
       subject.add_piece(2, 0)
@@ -36,5 +45,36 @@ describe Player do
     expect {
       subject.lose_piece(piece)
     }.to change(subject.pieces, :size).by(-1)
+  end
+  
+  it "should lose the game when it loses all of its pieces" do
+    (subject.pieces.size - 1).times do |i|
+      subject.lose_piece(subject.pieces[0])
+    end
+    expect {
+      subject.lose_piece(subject.pieces[0])
+    }.to change(subject, :lost?).from(false).to(true)
+  end
+  
+  it "should know its available moves" do
+    subject.available_moves.should =~ [[0, 3], [2, 3], [4, 3], [6, 3]]
+  end
+  
+  it "should only be allowed to make jumps when they're availble" do
+    # have the opponent move a piece that's jumpable by a piece
+    opponent.add_piece(2, 3)
+    subject.available_moves.should =~ [[1, 4], [3, 4]]
+  end
+  
+  it "should lose when it has no available moves" do
+    (subject.pieces.size - 1).times do |i|
+      subject.lose_piece(subject.pieces[0])
+    end
+    
+    subject.available_moves.should_not be_empty
+    subject.lose_piece(subject.pieces[0])
+    subject.available_moves.should be_empty
+    
+    subject.should be_lost
   end
 end

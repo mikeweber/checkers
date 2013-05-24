@@ -1,5 +1,5 @@
 class Piece
-  attr_reader :direction
+  attr_reader :direction, :color
   
   protected 
   attr_reader :board
@@ -7,8 +7,9 @@ class Piece
   
   public
   
-  def initialize(direction, board, col, row)
+  def initialize(direction, color, board, col, row)
     @direction = direction
+    @color     = color
     @board     = board
     @kinged    = false
     place_at(col, row)
@@ -22,6 +23,10 @@ class Piece
   
   def remove!
     self.board.remove_piece_from(*self.position)
+  end
+  
+  def available_moves_as_coordinates
+    self.available_moves.collect { |move| move.position }
   end
   
   def available_moves
@@ -45,13 +50,19 @@ class Piece
       piece_at_landing = self.board.piece_at(*landing)
       
       if piece_at_pos.nil?
-        moves << pos
+        moves << Move.new(pos, false)
       elsif !self.friend?(piece_at_pos) && inbounds?(landing) && piece_at_landing.nil?
-        moves << landing
+        moves << Move.new(landing, true)
       end
     end
     
     return moves
+  end
+  
+  Move = Struct.new(:position, :jump) do
+    def jump?
+      jump
+    end
   end
   
   def position
