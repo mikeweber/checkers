@@ -56,7 +56,6 @@ class Player
   end
   
   def has_jump?
-    raise piece_moves.inspect if $do_it
     piece_moves.any? { |move| move.jump? }
   end
   

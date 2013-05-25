@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Piece do
   subject     { piece }
-  let(:piece) { Piece.new(player, board, 0, 0) }
+  let(:piece) { Piece.new(player, board, 1, 0) }
   let(:board) { Board.new }
   let(:player){
     p = Player.new("Us")
@@ -16,26 +16,33 @@ describe Piece do
     p.color = :black
     p
   }
-  let(:desc)  { :desc }
-  let(:asc)   { :asc }
   
   it "should know where it is on the Board" do
-    subject.position.should == [0, 0]
+    subject.position.should == [1, 0]
   end
   
   it "should be able to move to a new position" do
     expect {
-      subject.move_to(1, 1)
-    }.to change(subject, :position).from([0, 0]).to([1, 1])
+      subject.move_to(0, 1)
+    }.to change(subject, :position).from([1, 0]).to([0, 1])
   end
   
   context "after a move" do
     it "should tell the board where it is" do
       expect {
         expect {
-          subject.move_to(1, 1)
-        }.to change { board.piece_at(1, 1) }.from(nil).to(subject)
-      }.to change { board.piece_at(0, 0) }.from(subject).to(nil)
+          subject.move_to(0, 1)
+        }.to change { board.piece_at(0, 1) }.from(nil).to(subject)
+      }.to change { board.piece_at(1, 0) }.from(subject).to(nil)
+    end
+    
+    it "should return false after a regular move" do
+      subject.move_to(0, 1).should be_false
+    end
+    
+    it "should return true after a jump" do
+      Piece.new(opp, board, 2, 1)
+      subject.move_to(3, 2).should be_true
     end
   end
   
@@ -50,6 +57,13 @@ describe Piece do
   it "should be able to be 'kinged'" do
     expect {
       piece.king_me!
+    }.to change(piece, :kinged?).from(false).to(true)
+  end
+  
+  it "should become kinged when reaching the other end of the board" do
+    piece = Piece.new(player, board, 1, 6)
+    expect {
+      piece.move_to(2, 7)
     }.to change(piece, :kinged?).from(false).to(true)
   end
   

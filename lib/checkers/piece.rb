@@ -26,16 +26,20 @@ class Piece
     raise "Illegal move" unless inbounds?([col, row])
     
     remove!
-    jump_piece(self.position, [col, row])
+    jump_result = jump_piece(self.position, [col, row])
     place_at(col, row)
+    king_me! if at_opposite_end?
+    
+    return jump_result
   end
   
   def jump_piece(pos1, pos2)
-    return unless move_is_jump?(pos1, pos2)
+    return false unless move_is_jump?(pos1, pos2)
     
     jumped_piece = self.board.piece_at((pos1[0] + pos2[0]) / 2, (pos1[1] + pos2[1]) / 2)
     jumped_piece.player.lose_piece(jumped_piece)
     jumped_piece.remove!
+    return true
   end
   
   def move_is_jump?(pos1, pos2)
@@ -114,5 +118,9 @@ class Piece
   
   def inbounds?(position)
     0 <= position.min && position.max <= 7
+  end
+  
+  def at_opposite_end?
+    self.position[1] == (player.direction == :asc) ? 7 : 0
   end
 end

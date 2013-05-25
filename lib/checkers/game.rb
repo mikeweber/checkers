@@ -2,7 +2,7 @@
 class Game
   protected
   attr_accessor :board
-  attr_reader :red, :black
+  attr_reader :red, :black, :whose_turn
   
   public
   
@@ -30,8 +30,7 @@ class Game
   def play!
     whose_turn = self.black
     while playing?
-      whose_turn.make_move
-      whose_turn = whose_turn == self.black ? self.red : self.black
+      take_turn
     end
     
     if self.red.lost?
@@ -43,5 +42,15 @@ class Game
   
   def playing?
     !self.red.lost? && !self.black.lost?
+  end
+  
+  def take_turn
+    toggle_turn whose_turn.make_move
+  end
+  
+  def toggle_turn(last_move_was_jump)
+    return if last_move_was_jump
+    
+    @whose_turn = whose_turn == self.black ? self.red : self.black
   end
 end
