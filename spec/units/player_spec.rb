@@ -77,4 +77,17 @@ describe Player do
     
     subject.should be_lost
   end
+  
+  it "should take the opponent's piece after a jump" do
+    # clear the board and setup a jump situation
+    subject.pieces.size.times { subject.lose_piece(subject.pieces[0]) }
+    opponent.pieces.size.times { opponent.lose_piece(opponent.pieces[0]) }
+    
+    subject.add_piece(2, 3)
+    opponent.add_piece(3, 4)
+    
+    expect {
+      subject.pieces[0].move_to(4, 5)
+    }.to change(opponent.pieces, :size).by(-1)
+  end
 end

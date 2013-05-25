@@ -1,5 +1,5 @@
 class Piece
-  attr_reader :direction, :color
+  attr_reader :player
   
   protected 
   attr_reader :board
@@ -7,18 +7,39 @@ class Piece
   
   public
   
-  def initialize(direction, color, board, col, row)
-    @direction = direction
-    @color     = color
-    @board     = board
-    @kinged    = false
+  def initialize(player, board, col, row)
+    @player = player
+    @board  = board
+    @kinged = false
     place_at(col, row)
+  end
+  
+  def direction
+    self.player.direction
+  end
+  
+  def color
+    self.player.color
   end
   
   def move_to(col, row)
     raise "Illegal move" unless inbounds?([col, row])
+    
     remove!
+    jump_piece(self.position, [col, row])
     place_at(col, row)
+  end
+  
+  def jump_piece(pos1, pos2)
+    return unless move_is_jump?(pos1, pos2)
+    
+    jumped_piece = self.board.piece_at((pos1[0] + pos2[0]) / 2, (pos1[1] + pos2[1]) / 2)
+    jumped_piece.player.lose_piece(jumped_piece)
+    jumped_piece.remove!
+  end
+  
+  def move_is_jump?(pos1, pos2)
+    (pos1[1] - pos2[1]).abs == 2
   end
   
   def remove!

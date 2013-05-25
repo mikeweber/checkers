@@ -17,7 +17,7 @@ class Player
   end
   
   def add_piece(col, row)
-    new_piece = Piece.new(self.direction, self.color, self.board, col, row)
+    new_piece = Piece.new(self, self.board, col, row)
     self.pieces << new_piece
     
     return new_piece
