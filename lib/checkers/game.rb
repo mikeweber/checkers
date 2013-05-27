@@ -30,18 +30,25 @@ class Game
   def play!
     self.whose_turn = self.black
     while playing?
-      take_turn
+      begin
+        take_turn
+      rescue EndGame => eg
+        @playing = false
+      end
     end
     
     if self.red.lost?
       self.black.you_win!
     elsif self.black.lost?
       self.red.you_win!
+    else
+      self.black.draw!
+      self.red.draw!
     end
   end
   
   def playing?
-    !self.red.lost? && !self.black.lost?
+    @playing.nil? && !self.red.lost? && !self.black.lost?
   end
   
   def take_turn
@@ -58,3 +65,5 @@ class Game
     player.has_jump?
   end
 end
+
+class EndGame < Exception; end

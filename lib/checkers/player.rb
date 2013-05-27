@@ -45,6 +45,9 @@ class Player
     @lost = true
   end
   
+  def draw!
+  end
+  
   def available_moves
     filtered_moves.collect { |move| move.position }.uniq
   end
