@@ -24,6 +24,7 @@ class Piece
   
   def move_to(col, row)
     raise "Illegal move" unless inbounds?([col, row])
+    raise "Not a moveable piece" unless self.can_move?
     
     remove!
     jump_result = jump_piece(self.position, [col, row])
@@ -50,8 +51,49 @@ class Piece
     self.board.remove_piece_from(*self.position)
   end
   
-  def available_moves_as_coordinates
-    self.available_moves.collect { |move| move.position }
+  def legal_moves_as_coordinates
+    self.legal_moves.collect { |move| move.position }
+  end
+  
+  def position
+    [@col, @row]
+  end
+  
+  # Identify Friend from Foe
+  def friend?(piece)
+    self.direction == piece.direction
+  end
+  
+  def king_me!
+    return false if kinged?
+    
+    self.kinged = true
+  end
+  
+  def kinged?
+    self.kinged
+  end
+  
+  def can_move?
+    self.player.has_jump? == self.has_jump?
+  end
+  
+  def has_move?
+    !self.legal_moves.empty?
+  end
+  
+  def legal_moves
+    self.has_jump? ? jump_moves : available_moves
+  end
+  
+  def has_jump?
+    available_moves.any? { |move| move.jump? }
+  end
+  
+  private
+  
+  def jump_moves
+    available_moves.select { |move| move.jump? }
   end
   
   def available_moves
@@ -89,27 +131,6 @@ class Piece
       jump
     end
   end
-  
-  def position
-    [@col, @row]
-  end
-  
-  # Identify Friend from Foe
-  def friend?(piece)
-    self.direction == piece.direction
-  end
-  
-  def king_me!
-    return false if kinged?
-    
-    self.kinged = true
-  end
-  
-  def kinged?
-    self.kinged
-  end
-  
-  private
   
   def place_at(col, row)
     raise "Board must be set" if self.board.nil?

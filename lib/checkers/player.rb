@@ -48,6 +48,10 @@ class Player
   def draw!
   end
   
+  def moveable_pieces
+    has_jump? ? pieces_that_can_jump : pieces_that_can_move
+  end
+  
   def available_moves
     filtered_moves.collect { |move| move.position }.uniq
   end
@@ -58,13 +62,21 @@ class Player
   
   private
   
+  def pieces_that_can_jump
+    pieces_that_can_move.select { |piece| piece.has_jump? }
+  end
+  
+  def pieces_that_can_move
+    self.pieces.select { |piece| piece.has_move? }
+  end
+  
   def filtered_moves
     has_jump? ? piece_moves.select { |move| move.jump? } : piece_moves
   end
   
   def piece_moves
     self.pieces.collect do |piece|
-      piece.available_moves
+      piece.legal_moves
     end.flatten
   end
   

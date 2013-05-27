@@ -35,7 +35,30 @@ describe Game do
         expect {
           player2.add_piece(4, 3)
         }.to change(player1, :has_jump?).from(false).to(true)
-      }.to change { player1.available_moves.size }.to(2)
+      }.to change { player1.moveable_pieces.size }.to(2)
+    end
+    
+    it "should not allow a player to move a piece that does not have a jump" do
+      player2.add_piece(4, 3)
+      player1.should be_has_jump
+      
+      non_jump_ready_piece = player1.pieces.detect { |piece| piece.position == [1, 2] }
+      player1.moveable_pieces.should_not include(non_jump_ready_piece)
+      
+      lambda { player1.pieces.detect { |piece| piece.position == [1, 2] }.move_to(0, 3) }.should raise_error
+      expect {
+        player1.pieces.detect { |piece| piece.position == [3, 2] }.move_to(5, 4)
+      }.to change { player2.pieces.size }.by(-1)
+    end
+    
+    it "should let the player make one jump when available" do
+      # setup a situation with a single jump
+      player2.add_piece(6, 3)
+      game.send(:whose_turn=, player1)
+      
+      expect {
+        game.toggle_turn player1.pieces.detect { |piece| piece.position == [7, 2] }.move_to(5, 4)
+      }.to change(game, :whose_turn).to(player2)
     end
     
     it "should let the player make multiple jumps" do
