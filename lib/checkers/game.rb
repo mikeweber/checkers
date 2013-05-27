@@ -39,11 +39,14 @@ class Game
     
     if self.red.lost?
       self.black.you_win!
+      "Black wins!"
     elsif self.black.lost?
       self.red.you_win!
+      "Red wins!"
     else
       self.black.draw!
       self.red.draw!
+      "It's a draw. Nobody wins."
     end
   end
   
