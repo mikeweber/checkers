@@ -1,8 +1,8 @@
 # encode utf-8
 class Game
   protected
-  attr_accessor :board
-  attr_reader :red, :black, :whose_turn
+  attr_accessor :board, :whose_turn
+  attr_reader :red, :black
   
   public
   
@@ -28,7 +28,7 @@ class Game
   end
   
   def play!
-    whose_turn = self.black
+    self.whose_turn = self.black
     while playing?
       take_turn
     end
@@ -45,12 +45,16 @@ class Game
   end
   
   def take_turn
-    toggle_turn whose_turn.make_move
+    toggle_turn self.whose_turn.make_move
   end
   
   def toggle_turn(last_move_was_jump)
-    return if last_move_was_jump
+    return if last_move_was_jump && jump_is_available_for(self.whose_turn)
     
-    @whose_turn = whose_turn == self.black ? self.red : self.black
+    self.whose_turn = self.whose_turn == self.black ? self.red : self.black
+  end
+  
+  def jump_is_available_for(player)
+    player.has_jump?
   end
 end

@@ -36,6 +36,7 @@ describe Game do
         landing_piece = player2.pieces.detect { |piece| piece.position == [7, 6] }
         player2.lose_piece(landing_piece)
         
+        game.send(:whose_turn=, player1)
         expect {
           game.toggle_turn player1.pieces.detect { |piece| piece.position == [7, 2] }.move_to(5, 4)
         }.to_not change(game, :whose_turn)

@@ -49,14 +49,14 @@ class Player
     filtered_moves.collect { |move| move.position }.uniq
   end
   
+  def has_jump?
+    piece_moves.any? { |move| move.jump? }
+  end
+  
   private
   
   def filtered_moves
     has_jump? ? piece_moves.select { |move| move.jump? } : piece_moves
-  end
-  
-  def has_jump?
-    piece_moves.any? { |move| move.jump? }
   end
   
   def piece_moves
