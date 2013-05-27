@@ -61,7 +61,10 @@ describe Piece do
   end
   
   it "should become kinged when reaching the other end of the board" do
-    piece = Piece.new(player, board, 1, 6)
+    piece = Piece.new(player, board, 2, 5)
+    expect {
+      piece.move_to(1, 6)
+    }.to_not change(piece, :kinged?).from(false)
     expect {
       piece.move_to(2, 7)
     }.to change(piece, :kinged?).from(false).to(true)

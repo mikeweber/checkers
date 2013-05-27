@@ -121,6 +121,6 @@ class Piece
   end
   
   def at_opposite_end?
-    self.position[1] == (player.direction == :asc) ? 7 : 0
+    self.position[1] == ((player.direction == :asc) ? 7 : 0)
   end
 end
