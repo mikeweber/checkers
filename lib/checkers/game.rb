@@ -55,17 +55,13 @@ class Game
   end
   
   def take_turn
-    toggle_turn self.whose_turn.make_move
+    toggle_turn *self.whose_turn.make_move
   end
   
-  def toggle_turn(last_move_was_jump)
-    return if last_move_was_jump && jump_is_available_for(self.whose_turn)
+  def toggle_turn(piece_moved, last_move_was_jump)
+    return if last_move_was_jump && piece_moved.has_jump?
     
     self.whose_turn = self.whose_turn == self.black ? self.red : self.black
-  end
-  
-  def jump_is_available_for(player)
-    player.has_jump?
   end
 end
 

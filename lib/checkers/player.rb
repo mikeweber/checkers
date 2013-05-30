@@ -60,6 +60,10 @@ class Player
     piece_moves.any? { |move| move.jump? }
   end
   
+  def inspect
+    "Player #{self.name} (#{self.color})"
+  end
+  
   private
   
   def pieces_that_can_jump

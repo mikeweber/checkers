@@ -29,7 +29,7 @@ class Piece
     remove!
     jump_result = jump_piece(self.position, [col, row])
     place_at(col, row)
-    king_me! if at_opposite_end?
+    jump_result &= !king_me! if at_opposite_end?
     
     return jump_result
   end

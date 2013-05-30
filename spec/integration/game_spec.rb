@@ -26,6 +26,23 @@ describe Game do
         game.play!
       }.to change(game, :playing?).from(true).to(false)
     end
+    
+    it "should be over when a player is prevented from making any moves" do
+      # remove all player1 pieces except from the corner
+      pieces = player1.pieces.clone
+      pieces.each do |piece|
+        player1.lose_piece(piece) unless piece.position == [7, 0]
+      end
+      player1.pieces.size.should == 1
+      
+      # Mock moving a piece into place to prevent a jump
+      player2.add_piece(5, 2)
+      expect {
+        expect {
+          player2.add_piece(6, 1)
+        }.to change { player1.available_moves.empty? }.from(false).to(true)
+      }.to change(game, :playing?).from(true).to(false)
+    end
   end
   
   context "when a jump is available" do
@@ -57,7 +74,8 @@ describe Game do
       game.send(:whose_turn=, player1)
       
       expect {
-        game.toggle_turn player1.pieces.detect { |piece| piece.position == [7, 2] }.move_to(5, 4)
+        piece = player1.pieces.detect { |piece| piece.position == [7, 2] }
+        game.toggle_turn piece, piece.move_to(5, 4)
       }.to change(game, :whose_turn).to(player2)
     end
     
@@ -69,11 +87,62 @@ describe Game do
       
       game.send(:whose_turn=, player1)
       expect {
-        game.toggle_turn player1.pieces.detect { |piece| piece.position == [7, 2] }.move_to(5, 4)
+        piece = player1.pieces.detect { |piece| piece.position == [7, 2] }
+        game.toggle_turn piece, piece.move_to(5, 4)
       }.to_not change(game, :whose_turn)
       expect {
-        game.toggle_turn player1.pieces.detect { |piece| piece.position == [5, 4] }.move_to(7, 6)
+        piece = player1.pieces.detect { |piece| piece.position == [5, 4] }
+        game.toggle_turn piece, piece.move_to(7, 6)
       }.to change(game, :whose_turn).to(player2)
+    end
+    
+    it "should not let a piece make multiple jumps on the same turn it is kinged" do
+      # setup a situation where a player can jump to get kinged, and have another jump available after
+      player1.pieces.detect { |piece| piece.position == [1, 2] }.remove!
+      player1.pieces.detect { |piece| piece.position == [3, 0] }.remove!
+      player1.pieces.detect { |piece| piece.position == [5, 2] }.remove!
+      
+      game.send(:whose_turn=, player2)
+      piece = player2.add_piece(1, 2)
+      expect {
+        expect {
+          player2.should be_has_jump
+          game.toggle_turn(piece, piece.move_to(3, 0))
+          player2.should be_has_jump
+        }.to change(piece, :kinged?).from(false).to(true)
+      }.to change(game, :whose_turn).from(player2).to(player1)
+    end
+    
+    it "should let a piece make multiple jumps on the same turn it reaches the end and is already kinged" do
+      # setup a situation where a player can jump to get kinged, and have another jump available after
+      player1.pieces.detect { |piece| piece.position == [1, 2] }.remove!
+      player1.pieces.detect { |piece| piece.position == [3, 0] }.remove!
+      player1.pieces.detect { |piece| piece.position == [5, 2] }.remove!
+      
+      game.send(:whose_turn=, player2)
+      piece = player2.add_piece(1, 2)
+      piece.king_me!
+      expect {
+        expect {
+          player2.should be_has_jump
+          game.toggle_turn(piece, piece.move_to(3, 0))
+          player2.should be_has_jump
+        }.to_not change(piece, :kinged?).from(true)
+      }.to_not change(game, :whose_turn).from(player2)
+    end
+    
+    it "should only allow the same piece to make multiple jumps" do
+      # setup a situation where 2 pieces can make a jump, do the jump, and confirm the turn is over
+      player1.pieces.detect { |piece| piece.position == [2, 1] }.remove!
+      player1.pieces.detect { |piece| piece.position == [4, 1] }.remove!
+      
+      piece1 = player2.add_piece(0, 3)
+      piece2 = player2.add_piece(6, 3)
+      
+      game.send(:whose_turn=, player2)
+      expect {
+        game.toggle_turn(piece1, piece1.move_to(2, 1))
+      }.to change(game, :whose_turn).from(player2).to(player1)
     end
   end
 end
