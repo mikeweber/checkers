@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'checkers'
-  s.version     = '0.2.6'
+  s.version     = '0.2.7'
   s.date        = '2013-05-27'
   s.description = "Implementing Checkers for fun and non-profit"
   s.summary     = "An implementation of the game of Checkers"
