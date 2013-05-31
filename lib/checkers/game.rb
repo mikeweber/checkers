@@ -29,13 +29,8 @@ class Game
   
   def play!
     self.whose_turn = self.black
-    while playing?
-      begin
-        take_turn
-      rescue EndGame => eg
-        @playing = false
-      end
-    end
+    
+    self.run_game
     
     if self.red.lost?
       self.black.you_win!
@@ -47,6 +42,16 @@ class Game
       self.black.draw!
       self.red.draw!
       "It's a draw. Nobody wins."
+    end
+  end
+  
+  def run_game
+    while playing?
+      begin
+        take_turn
+      rescue EndGame => eg
+        @playing = false
+      end
     end
   end
   
