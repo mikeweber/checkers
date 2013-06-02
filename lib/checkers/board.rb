@@ -1,5 +1,5 @@
 class Board
-  include IBoard
+  attr_reader :cols
   
   def initialize
     @cols = []
@@ -26,11 +26,5 @@ class Board
   
   def square_occupied?(col, row)
     !self.cols[col][row].nil?
-  end
-  
-  private
-  
-  def legal_position?(col, row)
-    col_array = self.cols[col]
   end
 end
