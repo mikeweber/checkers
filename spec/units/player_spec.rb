@@ -2,16 +2,14 @@ require 'spec_helper'
 
 describe Player do
   subject        {
-    player.direction = :asc
-    player.setup_board(board)
+    player.setup_board(board, :asc)
     player
   }
   let(:player)   { Player.new("Tester") }
   let(:board)    { Board.new }
   let(:opponent) {
     opp = Player.new("AI")
-    opp.direction = :desc
-    opp.setup_board(board, 5)
+    opp.setup_board(board, :desc)
     opp
   }
   

@@ -6,16 +6,12 @@ describe Piece do
   let(:board) { Board.new }
   let(:player){
     p = Player.new("Us")
-    p.direction = :asc
-    p.color = :red
-    p.setup_board(board)
+    p.setup_board(board, :asc)
     p
   }
   let(:opp)   {
     p = Player.new("Them")
-    p.direction = :desc
-    p.color = :black
-    p.setup_board(board, 5)
+    p.setup_board(board, :desc)
     p
   }
   

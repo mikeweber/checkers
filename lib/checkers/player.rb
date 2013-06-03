@@ -9,7 +9,9 @@ class Player
     @color  = nil
   end
   
-  def setup_board(board, first_row = 0)
+  def setup_board(board, direction = :asc)
+    first_row, @color = direction == :asc ? [0, :red] : [5, :black]
+    @direction = direction
     @board = board
     3.times do |i|
       set_row_of_pieces(first_row + i)

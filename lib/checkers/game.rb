@@ -20,11 +20,8 @@ class Game
   def setup_board
     @board = Board.new
     
-    self.red.direction, self.black.direction = [:asc, :desc]
-    self.red.color, self.black.color = [:red, :black]
-    
-    self.red.setup_board(self.board, 0)
-    self.black.setup_board(self.board, 5)
+    self.red.setup_board(self.board, :asc)
+    self.black.setup_board(self.board, :desc)
   end
   
   def play!
